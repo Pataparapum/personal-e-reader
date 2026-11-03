@@ -1,37 +1,18 @@
-use iced::widget::{Container, container, column, row};
-use iced::{Element, Never};
+mod app;
+mod config;
+mod input;
+mod screens;
+mod status;
+mod ui;
+
+use app::App;
+
 fn main() -> iced::Result {
-    iced::application(|| (), (), view)
+    iced::application(App::default, App::update, App::view)
         .title("E-reader")
-        .window_size(iced::Size::new(300.0, 400.0))
+        .subscription(App::subscription)
+        .theme(App::theme)
+        .window_size(config::window_size())
+        .resizable(false)
         .run()
-}
-
-fn view(_:&()) -> Container<'_, Never> {
-    
-    container(explorador())
-}
-
-fn explorador() -> Element<'static, Never> {
-
-    container(navbar()).into()
-
-}
-
-fn navbar() -> Element<'static, Never> {
-    use iced::Fill;
-
-    container(
-        column![
-            "top",
-            row!["left", "right"].spacing(10),
-            "bottom"
-        ]
-        .spacing(10)
-    )
-    .padding(10)
-    .center_x(Fill)
-    .center_y(Fill)
-    .into()
-
 }
