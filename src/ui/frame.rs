@@ -9,16 +9,16 @@ pub fn divider<'a, M: 'a>() -> Element<'a, M> {
 
 /// Marco común: título arriba, contenido al centro, ayuda abajo.
 pub fn frame<'a, M: 'a>(
-    title: &'a str,
+    title: impl Into<String>,
     body: impl Into<Element<'a, M>>,
-    hint: &'a str,
+    hint: impl Into<String>,
 ) -> Element<'a, M> {
     container(column![
-        container(text(title).size(22.0)).padding([12.0, 14.0]).width(Fill),
+        container(text(title.into()).size(22.0)).padding([12.0, 14.0]).width(Fill),
         divider(),
         container(body).width(Fill).height(Fill),
         divider(),
-        container(text(hint).size(12.0)).padding([6.0, 14.0]).width(Fill),
+        container(text(hint.into()).size(12.0)).padding([6.0, 14.0]).width(Fill),
     ])
     .width(Fill)
     .height(Fill)

@@ -1,6 +1,7 @@
 mod app;
 mod config;
 mod input;
+mod library;
 mod screens;
 mod status;
 mod ui;

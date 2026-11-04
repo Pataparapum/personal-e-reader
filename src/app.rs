@@ -2,11 +2,13 @@ use iced::widget::{column, container};
 use iced::{Element, Fill, Subscription, Theme};
 
 use crate::input::{self, Input};
-use crate::screens::{home::Home, lock, placeholder::Placeholder, Action, Route};
 use crate::status::Status;
 use crate::ui::frame::divider;
 use crate::ui::status_bar::status_bar;
 use crate::ui::style;
+use crate::screens::{
+    home::Home, library::LibraryScreen, lock, placeholder::Placeholder, Action, Route,
+};
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -15,7 +17,7 @@ pub enum Message {
 
 enum Screen {
     Home(Home),
-    Library(Placeholder),
+    Library(LibraryScreen),
     Audiobooks(Placeholder),
 }
 
@@ -23,7 +25,7 @@ impl From<Route> for Screen {
     fn from(route: Route) -> Self {
         match route {
             Route::Home => Screen::Home(Home::default()),
-            Route::Library => Screen::Library(Placeholder::new("Libros")),
+                        Route::Library => Screen::Library(LibraryScreen::new()),
             Route::Audiobooks => Screen::Audiobooks(Placeholder::new("Audiolibros")),
         }
     }
@@ -63,7 +65,8 @@ impl App {
 
         let action = match &mut self.screen {
             Screen::Home(s) => s.handle(input),
-            Screen::Library(s) | Screen::Audiobooks(s) => s.handle(input),
+            Screen::Library(s) => s.handle(input),
+            Screen::Audiobooks(s) => s.handle(input),
         };
 
         if let Some(Action::Navigate(route)) = action {
@@ -76,9 +79,10 @@ impl App {
             return lock::view(&self.status);
         }
 
-        let screen: Element<'_, Message> = match &self.screen {
+                let screen: Element<'_, Message> = match &self.screen {
             Screen::Home(s) => s.view(),
-            Screen::Library(s) | Screen::Audiobooks(s) => s.view(),
+            Screen::Library(s) => s.view(),
+            Screen::Audiobooks(s) => s.view(),
         };
 
         container(column![status_bar(&self.status), divider(), screen])

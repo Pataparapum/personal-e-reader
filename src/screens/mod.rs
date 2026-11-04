@@ -1,4 +1,5 @@
 pub mod home;
+pub mod library;
 pub mod lock;
 pub mod placeholder;
 
