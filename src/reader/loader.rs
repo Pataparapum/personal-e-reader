@@ -3,7 +3,7 @@ use std::path::Path;
 
 use epub::doc::EpubDoc;
 
-use super::html;
+use super::{encoding, html};
 
 /// Devuelve el libro como texto plano, un párrafo por linea.
 pub fn load(path: &Path) -> Result<String, String> {
@@ -21,7 +21,7 @@ pub fn load(path: &Path) -> Result<String, String> {
 
 fn load_txt(path: &Path) -> Result<String, String> {
     let bytes = fs::read(path).map_err(|e| e.to_string())?;
-    Ok(normalize_txt(&String::from_utf8_lossy(&bytes)))
+    Ok(normalize_txt(&encoding::decode(&bytes)))
 }
 
 /// Si el archivo usa lineas en blanco entre párrafos, une las líneas de cada

@@ -37,12 +37,21 @@ pub fn truncate(s: &str, max: usize) -> String {
     }
 }
 
-/// Muestra solo la página que contiene 'selected'.
+/// Muestra solo la página que contiene `selected`.
 pub fn paged_list<'a, M: 'a>(rows: &[ListRow], selected: usize) -> Element<'a, M> {
-    let start = selected / PAGE_SIZE * PAGE_SIZE;
+    paged_list_with(rows, selected, PAGE_SIZE, ROW_HEIGHT)
+}
+
+pub fn paged_list_with<'a, M: 'a>(
+    rows: &[ListRow],
+    selected: usize,
+    page_size: usize,
+    row_height: f32,
+) -> Element<'a, M> {
+    let start = selected / page_size * page_size;
     let mut list: Column<'a, M> = Column::new().spacing(6.0).padding(8.0);
 
-    for (i, row) in rows.iter().enumerate().skip(start).take(PAGE_SIZE) {
+    for (i, row) in rows.iter().enumerate().skip(start).take(page_size) {
         let mut line: Row<'a, M> = Row::new().spacing(8.0).align_y(Center);
         line = line.push(text(truncate(&row.label, LABEL_MAX_CHARS)).size(16.0).width(Fill));
         if let Some(detail) = &row.detail {
@@ -51,10 +60,10 @@ pub fn paged_list<'a, M: 'a>(rows: &[ListRow], selected: usize) -> Element<'a, M
 
         list = list.push(
             container(line)
-            .padding([0.0, 12.0])
-            .width(Fill)
-            .center_y(ROW_HEIGHT)
-            .style(style::item(i == selected)),
+                .padding([0.0, 12.0])
+                .width(Fill)
+                .center_y(row_height)
+                .style(style::item(i == selected)),
         );
     }
 
