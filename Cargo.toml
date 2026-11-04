@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+epub = "2.1.6"
 iced = { version="0.14.0", features = ["svg"] }
+ttf-parser = "0.25.1"

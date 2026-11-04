@@ -2,6 +2,7 @@ mod app;
 mod config;
 mod input;
 mod library;
+mod reader;
 mod screens;
 mod status;
 mod ui;

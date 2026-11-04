@@ -27,7 +27,7 @@ pub fn page_count(len: usize) -> usize {
     len.div_ceil(PAGE_SIZE).max(1)
 }
 
-fn truncate(s: &str, max: usize) -> String {
+pub fn truncate(s: &str, max: usize) -> String {
     if s.chars().count() <= max {
         s.to_string()
     } else {

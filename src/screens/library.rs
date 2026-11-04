@@ -1,15 +1,17 @@
+use std::path::Path;
+
 use iced::widget::{container, text};
 use iced::{Element, Fill};
 
 use super::{Action, Route};
+use crate::config::BOOKS_DIR;
 use crate::input::Input;
 use crate::library::{
-    self,
+    scan::scan,
     sort::{self, Group},
 };
-
 use crate::ui::frame::frame;
-use crate::ui::list::{page_count, paged_list, ListRow};
+use crate::ui::list::{page_count, paged_list, ListRow, PAGE_SIZE};
 
 enum Level {
     Authors,
@@ -27,7 +29,7 @@ pub struct LibraryScreen {
 impl LibraryScreen {
     pub fn new() -> Self {
         Self {
-            groups: sort::by_author(&library::mock()),
+            groups: sort::by_author(&scan(Path::new(BOOKS_DIR))),
             level: Level::Authors,
             selected: 0,
             author_cursor: 0,
@@ -53,17 +55,20 @@ impl LibraryScreen {
                 self.selected = (self.selected + 1) % n;
                 None
             }
-            Input::Select => {
-                if let Level::Authors = self.level {
+            Input::Select => match self.level {
+                Level::Authors => {
                     if n > 0 {
                         self.author_cursor = self.selected;
                         self.level = Level::Books(self.selected);
                         self.selected = 0;
                     }
+                    None
                 }
-                // Nivel Books: aquí se abrirá el lector.
-                None
-            }
+                Level::Books(g) => self.groups[g]
+                    .books
+                    .get(self.selected)
+                    .map(|b| Action::OpenBook(b.path.clone())),
+            },
             Input::Back => match self.level {
                 Level::Authors => Some(Action::Navigate(Route::Home)),
                 Level::Books(_) => {
@@ -74,7 +79,6 @@ impl LibraryScreen {
             },
             _ => None,
         }
-        
     }
 
     pub fn view<'a, M: 'a>(&self) -> Element<'a, M> {
@@ -96,12 +100,14 @@ impl LibraryScreen {
         };
 
         let body: Element<'a, M> = if rows.is_empty() {
-            container(text("No hay libros").size(18.0)).center(Fill).into()
+            container(text(format!("Sin libros en\n{BOOKS_DIR}/")).size(18.0))
+                .center(Fill)
+                .into()
         } else {
             paged_list(&rows, self.selected)
         };
 
-        let page = self.selected / crate::ui::list::PAGE_SIZE + 1;
+        let page = self.selected / PAGE_SIZE + 1;
         let hint = format!("Pág {}/{}   Esc: volver", page, page_count(rows.len()));
 
         frame(title, body, hint)
@@ -109,5 +115,9 @@ impl LibraryScreen {
 }
 
 fn count(n: usize) -> String {
-    if n == 1 { "1 libro".to_string() } else { format!("{n} libros") }
+    if n == 1 {
+        "1 libro".to_string()
+    } else {
+        format!("{n} libros")
+    }
 }
